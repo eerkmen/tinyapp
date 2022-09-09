@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('partials/_head.ejs') %>
+    <title>Register</title>
+  <body>
+    <%- include('partials/_header') %>
+    <h2>Please create an account</h2>
+    <form action="/register" method="POST">
+      <b>E-mail</b><br />
+      <input
+        type="email"
+        name="email"
+        size="30"
+      /><br />
+      <br />
+      <b>Password</b><br />
+      <input type="password"
+       name="password"
+      /><br />
+      <br />
+      <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+  </body>
+</html>
