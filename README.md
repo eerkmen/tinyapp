@@ -1,7 +1,19 @@
 # tinyapp
+Small app that creates short version of the urls provided
+
+
 DevDependencies
 
     chai
     mocha
     nodemon
-Small app that creates short version of the urls provided
+
+Dependencies
+    bcryptjs
+    cookie-parser
+    cookie-session
+    dotenv
+    ejs
+    express
+    method-override
+    morgan

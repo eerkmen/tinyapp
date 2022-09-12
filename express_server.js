@@ -9,6 +9,7 @@ const {
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const morgan = require('morgan');
+const methodOverride = require('method-override')
 
 app.use(morgan('dev'));
 app.set("view engine", "ejs")
