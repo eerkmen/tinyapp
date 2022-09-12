@@ -21,7 +21,9 @@ app.use(cookieSession({
   name: 'user_id',
   keys: [process.env.SECRET_KEY],
 }));
+app.use(methodOverride('_method'));
 
+//databases
 const users = {
   1: {
     id: 1,
@@ -36,9 +38,15 @@ const users = {
 };
 
 const urlDatabase = {
- 
+  b5UTxQ: {
+    longURL: "https://www.amazon.com",
+    userID: 2
+  },
+  i4BoGr: {
+    longURL: "https://www.google.com",
+    userID: 2
+  }
 };
-
 //Register GET and POST
 app.get('/register', (req, res) => {
   const id = req.session.user_id;
@@ -89,18 +97,18 @@ app.get('/login', (req, res) => {
 app.post("/login", (req, res) => {
   
   const email = req.body.email;
-  const user = getUserByEmail(req.body.email, users);
+  const user = getUserByEmail(email, users);
   const password = req.body.password;
 
   if (!email || !password) {
     return res.status(400).send('Please fill out email and password.');
   }
 
-  if (!user || !bcrypt.compareSync(password, users[user][password])) {
+  if (!user || !bcrypt.compareSync(password, users[user.id].password)) {
     return res.status(403).send(`Wrong password, try again`);
   }
 
-  req.session.user_id = users[user]['id'];;
+  req.session.user_id = users[user.id]['id'];;
   res.redirect("/urls");
 });
 
@@ -110,7 +118,7 @@ app.post("/logout", (req, res) => {
   res.redirect("/login");
 });
 
-
+//url and it's routes
 app.get('/urls', (req, res) => {
   
   if (!req.session.user_id) {
@@ -119,7 +127,7 @@ app.get('/urls', (req, res) => {
 
   const templateVars = {
     user: users[req.session.user_id],
-    urls: urlsForUser(id, urlDatabase),
+    urls: urlsForUser(req.session.user_id, urlDatabase),
   };
   res.render("urls_index", templateVars);
 });
@@ -153,10 +161,6 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     user: users[req.session.user_id],
     id,
-    url: {
-      ...urlDatabase[id],
-      uniqueVisitors: getUniqueVisitors(id, urlDatabase),
-    }
   };
   res.render("urls_show", templateVars);
 });
@@ -183,7 +187,7 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${newId}`);
 });
 
-
+//url delete
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (!req.session.user_id) {
     return res.send(`Try again, something went wrong`);
@@ -194,6 +198,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
+//editing url
 app.post("/urls/:shortURL", (req, res) => {
   
   if (!req.session.user_id) {
