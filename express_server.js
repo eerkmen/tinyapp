@@ -10,8 +10,8 @@ const {
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
 const morgan = require('morgan');
-const methodOverride = require('method-override')
-
+const methodOverride = require('method-override');
+const bodyParser = require("body-parser");
 
 //Middleware
 app.use(morgan('dev'));
@@ -55,7 +55,7 @@ app.get('/register', (req, res) => {
     return es.redirect('/urls');
   }
   
-  res.render("urls_register", user);
+  res.render("urls_register", { user: null });
 });
 
 app.post('/register', (req, res) => {
@@ -71,7 +71,7 @@ app.post('/register', (req, res) => {
     return res.status(400).send('Try a different email, it is already taken.');
   }
 
-  const id = generateRandomString(urlDatabase);
+  const id = generateRandomString();
   
   users[id] = {
     id,
@@ -121,10 +121,10 @@ app.post("/logout", (req, res) => {
 //url and it's routes
 app.get('/urls', (req, res) => {
   
-  if (!req.session.user_id) {
-    return res.send(`You need to login to continue with this page.`);
-  }
-
+  // if (!req.session.user_id) {
+  //   return res.send(`You need to login to continue with this page.`);
+  // }
+  
   const templateVars = {
     user: users[req.session.user_id],
     urls: urlsForUser(req.session.user_id, urlDatabase),
@@ -133,9 +133,9 @@ app.get('/urls', (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  if (!req.session.user_id) {
-    return res.redirect('/login');
-  }
+  // if (!req.session.user_id) {
+  //   return res.redirect('/login');
+  // }
   const templateVars = { 
     user: users[req.session.user_id] 
   };
@@ -154,9 +154,9 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  if (!req.session.user_id) {
-    return res.send(`Try again, something went wrong`);
-  }
+  // if (!req.session.user_id) {
+  //   return res.send(`Try again, something went wrong`);
+  // }
   const { id } = req.params;
   const templateVars = {
     user: users[req.session.user_id],
@@ -175,23 +175,23 @@ app.get("/", (req, res) => {
 
 
 app.post('/urls', (req, res) => {
-  if (!req.session.user_id) {
-    return res.send(`Try again, something went wrong`);
-  }
+  // if (!req.session.user_id) {
+  //   return res.send(`Try again, something went wrong`);
+  // }
   
   const short = generateRandomString();
   urlDatabase[short] = {
     longURL: req.body.longURL,
     userId: req.session.user_id,
   };
-  res.redirect(`/urls/${newId}`);
+  res.redirect(`/urls`);
 });
 
 //url delete
 app.post("/urls/:shortURL/delete", (req, res) => {
-  if (!req.session.user_id) {
-    return res.send(`Try again, something went wrong`);
-  }
+  // if (!req.session.user_id) {
+  //   return res.send(`Try again, something went wrong`);
+  // }
 
   delete urlDatabase[req.params.shortURL];
   
@@ -199,18 +199,23 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 //editing url
-app.post("/urls/:shortURL", (req, res) => {
+app.post("/urls/:id", (req, res) => {
   
-  if (!req.session.user_id) {
-    return res.send(`Login first to access this action.`);
-  }
+  // if (!req.session.user_id) {
+  //   return res.send(`Login first to access this action.`);
+  // }
 
-  const longURL = req.body.longURL;
-  const short = req.params.shortURL;
-  urlDatabase[short] = {
-    longURL, 
-    userID,
-  };
+  //const longURL = req.body.longURL;
+  // const short = req.params.shortURL;
+  // urlDatabase[short] = {
+  //   longURL, 
+  //   userID,
+  // };
+  // res.redirect("/urls");
+
+  const url = urlDatabase[shortURL];
+  const longURL = url.longURL;
+  const templateVars = { user, shortURL, longURL };
   res.redirect("/urls");
 });
 
