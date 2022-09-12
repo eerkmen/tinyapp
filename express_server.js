@@ -1,6 +1,7 @@
 //dependencies
 const express = require("express");
 const app = express();
+require('dotenv').config()
 const PORT = 8080; // default port 8080
 const {
   getUserByEmail,
@@ -28,7 +29,7 @@ const users = {
   1: {
     id: 1,
     email: 'name@mail.com',
-    password: [process.env.password1],
+    password: 'car',
   },
   2: {
     id: 2,
@@ -40,11 +41,11 @@ const users = {
 const urlDatabase = {
   b5UTxQ: {
     longURL: "https://www.amazon.com",
-    userID: 2
+    userID: 1
   },
   i4BoGr: {
     longURL: "https://www.google.com",
-    userID: 2
+    userID: 1
   }
 };
 //Register GET and POST
@@ -79,6 +80,9 @@ app.post('/register', (req, res) => {
     password: bcrypt.hashSync(password),
   };
   req.session.user_id = id;
+  console.log("req.session",req.session)
+  console.log("id",id)
+
   res.redirect("/urls");
 });
 
@@ -91,7 +95,7 @@ app.get('/login', (req, res) => {
     return es.redirect('/urls');
   }
 
-  res.render("urls_login", user);
+  res.render("urls_login", { user: null });
 });
 
 app.post("/login", (req, res) => {
@@ -99,15 +103,16 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const user = getUserByEmail(email, users);
   const password = req.body.password;
-
+  console.log(password)
+  console.log(users[user['id']]['password'])
   if (!email || !password) {
     return res.status(400).send('Please fill out email and password.');
   }
 
-  if (!user || !bcrypt.compareSync(password, users[user.id].password)) {
+  if (!user || bcrypt.compareSync(password, users[user['id']]['password'])) {
     return res.status(403).send(`Wrong password, try again`);
   }
-
+  
   req.session.user_id = users[user.id]['id'];;
   res.redirect("/urls");
 });
@@ -121,21 +126,22 @@ app.post("/logout", (req, res) => {
 //url and it's routes
 app.get('/urls', (req, res) => {
   
-  // if (!req.session.user_id) {
-  //   return res.send(`You need to login to continue with this page.`);
-  // }
+  if (!req.session.user_id) {
+    return res.send(`You need to login to continue with this page.`);
+  }
   
   const templateVars = {
     user: users[req.session.user_id],
     urls: urlsForUser(req.session.user_id, urlDatabase),
   };
+
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  // if (!req.session.user_id) {
-  //   return res.redirect('/login');
-  // }
+  if (!req.session.user_id) {
+    return res.redirect('/login');
+  }
   const templateVars = { 
     user: users[req.session.user_id] 
   };
@@ -154,13 +160,15 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  // if (!req.session.user_id) {
-  //   return res.send(`Try again, something went wrong`);
-  // }
+  if (!req.session.user_id) {
+    return res.send(`Try again, something went wrong`);
+  }
   const { id } = req.params;
   const templateVars = {
     user: users[req.session.user_id],
-    id,
+    shortURL: id,
+    longURL: urlDatabase[id].longURL
+
   };
   res.render("urls_show", templateVars);
 });
@@ -169,29 +177,25 @@ app.get("/", (req, res) => {
   res.redirect('/login');
 });
 
-
-
-
-
-
+//new shorturl creation
 app.post('/urls', (req, res) => {
-  // if (!req.session.user_id) {
-  //   return res.send(`Try again, something went wrong`);
-  // }
+  if (!req.session.user_id) {
+    return res.send(`Try again, something went wrong`);
+  }
   
-  const short = generateRandomString();
-  urlDatabase[short] = {
+  const id = generateRandomString();
+  urlDatabase[id] = {
     longURL: req.body.longURL,
     userId: req.session.user_id,
   };
-  res.redirect(`/urls`);
+  res.redirect(`/urls/${id}`);
 });
 
 //url delete
 app.post("/urls/:shortURL/delete", (req, res) => {
-  // if (!req.session.user_id) {
-  //   return res.send(`Try again, something went wrong`);
-  // }
+  if (!req.session.user_id) {
+    return res.send(`Try again, something went wrong`);
+  }
 
   delete urlDatabase[req.params.shortURL];
   
@@ -201,22 +205,16 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //editing url
 app.post("/urls/:id", (req, res) => {
   
-  // if (!req.session.user_id) {
-  //   return res.send(`Login first to access this action.`);
-  // }
+  if (!req.session.user_id) {
+    return res.send(`Login first to access this action.`);
+  }
 
-  //const longURL = req.body.longURL;
-  // const short = req.params.shortURL;
-  // urlDatabase[short] = {
-  //   longURL, 
-  //   userID,
-  // };
-  // res.redirect("/urls");
-
-  const url = urlDatabase[shortURL];
-  const longURL = url.longURL;
-  const templateVars = { user, shortURL, longURL };
-  res.redirect("/urls");
+  const id = generateRandomString();
+  urlDatabase[id] = {
+    longURL: req.body.longURL,
+    userId: req.session.user_id,
+  };
+  res.redirect(`/urls/${id}`);
 });
 
 

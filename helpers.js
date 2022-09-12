@@ -1,12 +1,14 @@
-const urlsForUser = function(id, database) {
-  let urls = {};
-  for (const urlId in database) {
-
-    if (id === database[urlId].userID) {
-      userURLS = { ...urls, [urlId]: database[urlId] };
+const urlsForUser = function(userId, database) {
+  const urls = {};
+  for (const ui in database) {
+    if (userId === database[ui]['userId']) {
+      urls[ui] = { 
+        longURL: database[ui]['longURL'],
+        userId,
+      }
     }
   }
-  return userURLS;
+  return urls;
 };
 
 const getUserByEmail = function(email, database) {
@@ -29,9 +31,9 @@ const generateRandomString = function() {
   return random;
 };
 
-const canAccessURL = (req, urlId, database) => {
+const canAccessURL = (req, ui, database) => {
   const user = req.session.user_id;
-  return urlId in urlsForUser(user, database);
+  return ui in urlsForUser(user, database);
 };
 
 module.exports = { 
