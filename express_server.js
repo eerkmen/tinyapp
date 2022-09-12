@@ -29,12 +29,12 @@ const users = {
   1: {
     id: 1,
     email: 'name@mail.com',
-    password: 'car',
+    password: process.env.password1,
   },
   2: {
     id: 2,
     email: 'name2@mail.com',
-    password: [process.env.password2],
+    password: process.env.password2,
   },
 };
 
@@ -103,14 +103,13 @@ app.post("/login", (req, res) => {
   const email = req.body.email;
   const user = getUserByEmail(email, users);
   const password = req.body.password;
-  console.log(password)
-  console.log(users[user['id']]['password'])
+  
   if (!email || !password) {
     return res.status(400).send('Please fill out email and password.');
   }
 
   if (!user || bcrypt.compareSync(password, users[user['id']]['password'])) {
-    return res.status(403).send(`Wrong password, try again`);
+    return res.status(403).send(`Wrong login information, try again.`);
   }
   
   req.session.user_id = users[user.id]['id'];;
@@ -129,7 +128,7 @@ app.get('/urls', (req, res) => {
   if (!req.session.user_id) {
     return res.send(`You need to login to continue with this page.`);
   }
-  
+
   const templateVars = {
     user: users[req.session.user_id],
     urls: urlsForUser(req.session.user_id, urlDatabase),
@@ -167,7 +166,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     user: users[req.session.user_id],
     shortURL: id,
-    longURL: urlDatabase[id].longURL
+    longURL: urlDatabase[id]['longURL']
 
   };
   res.render("urls_show", templateVars);
@@ -186,7 +185,7 @@ app.post('/urls', (req, res) => {
   const id = generateRandomString();
   urlDatabase[id] = {
     longURL: req.body.longURL,
-    userId: req.session.user_id,
+    userID: req.session.user_id,
   };
   res.redirect(`/urls/${id}`);
 });
@@ -212,7 +211,7 @@ app.post("/urls/:id", (req, res) => {
   const id = generateRandomString();
   urlDatabase[id] = {
     longURL: req.body.longURL,
-    userId: req.session.user_id,
+    userID: req.session.user_id,
   };
   res.redirect(`/urls/${id}`);
 });
