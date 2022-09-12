@@ -9,6 +9,7 @@ DevDependencies
     nodemon
 
 Dependencies
+
     bcryptjs
     cookie-parser
     cookie-session
@@ -20,7 +21,9 @@ Dependencies
 
 How to use?
 Make .env file in the root directory and paste this:
+
 SECRET_KEY="YOURSECRETKEYGOESHERE"
 
 password1= 1234
+
 password2= 2345
