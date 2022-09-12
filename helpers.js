@@ -1,7 +1,7 @@
 const urlsForUser = function(userId, database) {
   const urls = {};
   for (const ui in database) {
-    if (userId === database[ui]['userId']) {
+    if (userId === database[ui]['userID']) {
       urls[ui] = { 
         longURL: database[ui]['longURL'],
         userId,
