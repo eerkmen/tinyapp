@@ -1,25 +1,39 @@
-# tinyapp
-Small app that creates short version of the urls provided
+# TinyApp Project
+
+TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs (à la bit.ly).
+
+## Final Product
+
+!["Main URL page"](/screenshots/url.png)
+!["URL creation page"](/screenshots/create-url.png)
+!["Register"](/screenshots/register.png)
+!["Login"](/screenshots/login.png)
+!["Short URL"](/screenshots/short-url.png)
 
 
-DevDependencies
+## DevDependencies
 
-    chai
-    mocha
-    nodemon
+    - chai
+    - mocha
+    - nodemon
 
-Dependencies
+## Dependencies
 
-    bcryptjs
-    cookie-parser
-    cookie-session
-    dotenv
-    ejs
-    express
-    method-override
-    morgan
+    - bcryptjs
+    - cookie-parser
+    - cookie-session
+    - dotenv
+    - ejs
+    - express
+    - method-override
+    - morgan
 
-How to use?
+## Getting Started
+
+- Install all dependencies (using the `npm install` command).
+- Run the development web server using the `node express_server.js` command.
+
+## How to use?
 Make .env file in the root directory and paste this:
 
 SECRET_KEY="YOURSECRETKEYGOESHERE"
