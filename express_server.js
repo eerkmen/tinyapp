@@ -80,8 +80,7 @@ app.post('/register', (req, res) => {
     password: bcrypt.hashSync(password),
   };
   req.session.user_id = id;
-  console.log("req.session",req.session)
-  console.log("id",id)
+  
 
   res.redirect("/urls");
 });
