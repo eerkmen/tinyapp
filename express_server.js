@@ -92,7 +92,7 @@ app.get('/login', (req, res) => {
   const id = req.session.user_id;
   const user = users[id];
   if (users[id]) {
-    return es.redirect('/urls');
+    return res.redirect('/urls');
   }
 
   res.render("urls_login", { user: null });
