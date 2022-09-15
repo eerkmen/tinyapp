@@ -27,13 +27,13 @@ app.use(methodOverride('_method'));
 //databases
 const users = {
   1: {
-    id: 1,
-    email: 'name@mail.com',
+    id: process.env.id1,
+    email: process.env.email1,
     password: process.env.password1,
   },
   2: {
-    id: 2,
-    email: 'name2@mail.com',
+    id: process.env.id2,
+    email: process.env.email2,
     password: process.env.password2,
   },
 };
