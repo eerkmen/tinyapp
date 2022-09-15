@@ -41,3 +41,11 @@ SECRET_KEY="YOURSECRETKEYGOESHERE"
 password1= 1234
 
 password2= 2345
+
+email1 = 'name@mail.com'
+
+email2 = 'name2@mail.com'
+
+id1 = 1
+
+id2 = 2
