@@ -139,9 +139,14 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(url.longURL);
 });
 
+//URL edit
 app.get("/urls/:id", (req, res) => {
+  const userID = req.session.user_id;
   if (!req.session.user_id) {
     return res.send(`Try again, something went wrong`);
+  }
+  if (urlDatabase[req.params.shortURL].userID !== userID) {
+    return res.send("You don't have permission to change this URL data.");
   }
   const { id } = req.params;
   const templateVars = {
