@@ -55,7 +55,6 @@ app.get('/register', (req, res) => {
   if (users[id]) {
     return es.redirect('/urls');
   }
-  
   res.render("urls_register", { user: null });
 });
 
@@ -66,25 +65,18 @@ app.post('/register', (req, res) => {
   if (!email || !password) {
     return res.status(400).send('Please fill out email and password.');
   }
-
-
   if (getUserByEmail(email, users)) {
     return res.status(400).send('Try a different email, it is already taken.');
   }
-
   const id = generateRandomString();
-  
-  users[id] = {
+    users[id] = {
     id,
     email,
     password: bcrypt.hashSync(password),
   };
   req.session.user_id = id;
-  
-
   res.redirect("/urls");
 });
-
 
 //Login GET and POST
 app.get('/login', (req, res) => {
@@ -93,24 +85,19 @@ app.get('/login', (req, res) => {
   if (users[id]) {
     return res.redirect('/urls');
   }
-
   res.render("urls_login", { user: null });
 });
 
 app.post("/login", (req, res) => {
-  
   const email = req.body.email;
   const user = getUserByEmail(email, users);
   const password = req.body.password;
-  
   if (!email || !password) {
     return res.status(400).send('Please fill out email and password.');
   }
-
   if (!user || bcrypt.compareSync(password, users[user['id']]['password'])) {
     return res.status(403).send(`Wrong login information, try again.`);
   }
-  
   req.session.user_id = users[user.id]['id'];;
   res.redirect("/urls");
 });
@@ -123,16 +110,13 @@ app.post("/logout", (req, res) => {
 
 //url and it's routes
 app.get('/urls', (req, res) => {
-  
   if (!req.session.user_id) {
     return res.send(`You need to login to continue with this page.`);
   }
-
   const templateVars = {
     user: users[req.session.user_id],
     urls: urlsForUser(req.session.user_id, urlDatabase),
   };
-
   res.render("urls_index", templateVars);
 });
 
@@ -149,11 +133,9 @@ app.get("/urls/new", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const short = req.params.shortURL;
   const ul = urlDatabase[short];
-
   if (!ul) {
     return res.send('TRY AGAIN');
   }
-
   res.redirect(url.longURL);
 });
 
@@ -166,7 +148,6 @@ app.get("/urls/:id", (req, res) => {
     user: users[req.session.user_id],
     shortURL: id,
     longURL: urlDatabase[id]['longURL']
-
   };
   res.render("urls_show", templateVars);
 });
@@ -180,7 +161,6 @@ app.post('/urls', (req, res) => {
   if (!req.session.user_id) {
     return res.send(`Try again, something went wrong`);
   }
-  
   const id = generateRandomString();
   urlDatabase[id] = {
     longURL: req.body.longURL,
@@ -194,19 +174,15 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   if (!req.session.user_id) {
     return res.send(`Try again, something went wrong`);
   }
-
   delete urlDatabase[req.params.shortURL];
-  
   res.redirect("/urls");
 });
 
 //editing url
 app.post("/urls/:id", (req, res) => {
-  
   if (!req.session.user_id) {
     return res.send(`Login first to access this action.`);
   }
-
   const id = generateRandomString();
   urlDatabase[id] = {
     longURL: req.body.longURL,
@@ -219,8 +195,6 @@ app.post("/urls/:id", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
-
-
 
 //This checks if the server is listening
 app.listen(PORT, () => {
