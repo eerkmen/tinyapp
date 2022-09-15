@@ -145,7 +145,7 @@ app.get("/urls/:id", (req, res) => {
   if (!req.session.user_id) {
     return res.send(`Try again, something went wrong`);
   }
-  if (urlDatabase[req.params.shortURL].userID !== userID) {
+  if (urlDatabase[req.params.id].userID !== userID) {
     return res.send("You don't have permission to change this URL data.");
   }
   const { id } = req.params;
