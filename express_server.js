@@ -130,8 +130,8 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new", templateVars);
 });
 
-app.get("/u/:shortURL", (req, res) => {
-  const short = req.params.shortURL;
+app.get("/u/:id", (req, res) => {
+  const short = req.params.id;
   const ul = urlDatabase[short];
   if (!ul) {
     return res.send('TRY AGAIN');
@@ -158,7 +158,12 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.redirect('/login');
+  if (!req.session.user_id) {
+    res.redirect('/login');
+  }
+  if (req.session.user_id) {
+    res.redirect('/urls')
+  }
 });
 
 //new short url creation
@@ -190,8 +195,12 @@ app.post("/urls/:id/delete", (req, res) => {
 
 //editing short url
 app.post("/urls/:id", (req, res) => {
+  const userID = req.session.user_id;
   if (!req.session.user_id) {
     return res.send(`Login first to access this action.`);
+  }
+  if (urlDatabase[req.params.id].userID !== userID) {
+    return res.send("You don't have permission to delete this URL data.");
   }
   const id = generateRandomString();
   urlDatabase[id] = {
