@@ -202,7 +202,7 @@ app.post("/urls/:id", (req, res) => {
   if (urlDatabase[req.params.id].userID !== userID) {
     return res.send("You don't have permission to delete this URL data.");
   }
-  const id = generateRandomString();
+  const id = req.params.id;
   urlDatabase[id] = {
     longURL: req.body.longURL,
     userID: req.session.user_id,
