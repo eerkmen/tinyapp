@@ -29,23 +29,23 @@ const users = {
   1: {
     id: process.env.id1,
     email: process.env.email1,
-    password: process.env.password1,
+    password: bcrypt.hashSync(process.env.password1),
   },
   2: {
     id: process.env.id2,
     email: process.env.email2,
-    password: process.env.password2,
+    password: bcrypt.hashSync(process.env.password2),
   },
 };
 
 const urlDatabase = {
   b5UTxQ: {
     longURL: "https://www.amazon.com",
-    userID: 1
+    userID: process.env.id1
   },
   i4BoGr: {
     longURL: "https://www.google.com",
-    userID: 1
+    userID: process.env.id1
   }
 };
 //Register GET and POST
@@ -95,7 +95,7 @@ app.post("/login", (req, res) => {
   if (!email || !password) {
     return res.status(400).send('Please fill out email and password.');
   }
-  if (!user || bcrypt.compareSync(password, users[user['id']]['password'])) {
+  if (!user || !bcrypt.compareSync(password, users[user['id']]['password'])) {
     return res.status(403).send(`Wrong login information, try again.`);
   }
   req.session.user_id = users[user.id]['id'];;
@@ -105,7 +105,7 @@ app.post("/login", (req, res) => {
 //Logout
 app.post("/logout", (req, res) => {
   req.session = undefined;
-  res.redirect("/login");
+  res.redirect("/urls");
 });
 
 //url and it's routes
@@ -139,7 +139,7 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(url.longURL);
 });
 
-//URL edit
+//Short URL edit
 app.get("/urls/:id", (req, res) => {
   const userID = req.session.user_id;
   if (!req.session.user_id) {
@@ -161,7 +161,7 @@ app.get("/", (req, res) => {
   res.redirect('/login');
 });
 
-//new shorturl creation
+//new short url creation
 app.post('/urls', (req, res) => {
   if (!req.session.user_id) {
     return res.send(`Try again, something went wrong`);
@@ -174,16 +174,21 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${id}`);
 });
 
-//url delete
-app.post("/urls/:shortURL/delete", (req, res) => {
+//short url delete
+app.post("/urls/:id/delete", (req, res) => {
+  const userID = req.session.user_id;
   if (!req.session.user_id) {
     return res.send(`Try again, something went wrong`);
   }
-  delete urlDatabase[req.params.shortURL];
+  if (urlDatabase[req.params.id].userID !== userID) {
+    return res.send("You don't have permission to delete this URL data.");
+  } else {
+    delete urlDatabase[req.params.id];
+  }
   res.redirect("/urls");
 });
 
-//editing url
+//editing short url
 app.post("/urls/:id", (req, res) => {
   if (!req.session.user_id) {
     return res.send(`Login first to access this action.`);
